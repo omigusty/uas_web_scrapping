@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="h-full overflow-y-auto">
+    <div class="container grid px-6 mx-auto">
+        <div class="max-w-4xl">
+            {% for newsDetail in newsDetails %}
+            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                {{ newsDetail.title }}
+            </h2>
+            <div>
+                <div class="flex mb-2 flex-row justify-between">
+                    <p class="text-sm mr-4 font-medium text-gray-600 dark:text-gray-400">{{ newsDetail.category }}</p>
+                    <div class="flex flex-row">
+                        <p class="text-sm mr-2 font-medium text-gray-600 dark:text-gray-400">{{ newsDetail.views }} kali
+                            dilihat</p>
+                        <p class="text-sm mr-2 font-medium text-gray-600 dark:text-gray-400">•</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ newsDetail.date }}</p>
+                    </div>
+                </div>
+                <img class="w-full" src="https://www.mncvision.id/{{ newsDetail.coverImage }}" alt="">
+                <article class="text-md mt-4 font-normal text-gray-500 dark:text-gray-300">
+                    {{ newsDetail.content }}
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock %}
