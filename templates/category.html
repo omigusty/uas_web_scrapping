@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="h-full overflow-y-auto">
+    <div class="container px-6 mx-auto grid">
+        <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+            {{ title }}
+        </h2>
+        <!-- Card News -->
+        <div class="grid gap-6 mb-8 md:grid-cols-2">
+            {% for news in newsByCategory %}
+            <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                <picture>
+                    <img src="https://www.mncvision.id/{{ news.thumbnail }}" alt="">
+                </picture>
+                <div class="flex mt-2 mb-2 flex-row justify-between">
+                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ news.category }}</p>
+                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ news.date }}</p>
+                </div>
+                <form action="{{ url_for('newsDetail') }}" method="POST">
+                    <input type="hidden" name="getUrl" value="{{ news.link }}">
+                    <button type="submit" class="float-left flex justify-content-start">
+                        <a type="submit" class="text-left text-xl font-semibold text-gray-600 dark:text-gray-300">
+                            {{ news.title }}
+                        </a>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock %}

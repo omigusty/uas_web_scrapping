@@ -1,35 +1,37 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, send_file, request, redirect, url_for
+from flask import Flask, render_template, send_file, request
 
 app = Flask(__name__)
+
+
 datas = []
+
+urlTarget = requests.get(
+    "https://www.mncvision.id/article/index/-/all")
+beautify = BeautifulSoup(urlTarget.content, "html.parser")
+articles = beautify.find_all("div", class_="latest-wrapper clearfix")
+for article in articles:
+    getThumbnail = article.find("img", class_="img-responsive")
+    getCategory = article.find("a", class_="tag").text
+    getDate = article.find("span", class_="pull-right").text
+    getTitle = article.find("h3", class_="news-title").text
+    getLink = article.find("a")
+
+    # format document
+    datas.append({
+        "thumbnail": getThumbnail["src"],
+        "title": getTitle,
+        "category": getCategory,
+        "date": getDate,
+        "link": getLink["href"]
+    })
 
 
 @app.route('/')
 def index():
     try:
-        urlTarget = requests.get(
-            "https://www.mncvision.id/article/index/-/all")
-        beautify = BeautifulSoup(urlTarget.content, "html.parser")
-        articles = beautify.find_all("div", class_="latest-wrapper clearfix")
-        for article in articles:
-            getThumbnail = article.find("img", class_="img-responsive")
-            getCategory = article.find("a", class_="tag").text
-            getDate = article.find("span", class_="pull-right").text
-            getTitle = article.find("h3", class_="news-title").text
-            getLink = article.find("a")
-
-            # format document
-            datas.append({
-                "thumbnail": getThumbnail["src"],
-                "title": getTitle,
-                "category": getCategory,
-                "date": getDate,
-                "link": getLink["href"]
-            })
-
         return render_template("index.html", datas=datas)
 
     except Exception as err:
@@ -68,6 +70,17 @@ def newsDetail():
 
     except Exception as err:
         return "Error: {}".format({err})
+
+
+@app.route("/read/<string:getCategory>")
+def readNews(getCategory):
+    newsByCategory = []
+
+    for data in datas:
+        if data["category"] == getCategory:
+            newsByCategory.append(data)
+
+    return render_template("category.html", newsByCategory=newsByCategory, title=getCategory)
 
 
 @app.route("/download")
