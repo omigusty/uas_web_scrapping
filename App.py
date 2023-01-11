@@ -1,10 +1,13 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, send_file, request
+from flask import Flask, render_template, send_file, request, session, redirect, url_for
+from flask_session import Session
 
 app = Flask(__name__)
-
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 datas = []
 
@@ -32,6 +35,8 @@ for article in articles:
 @app.route('/')
 def index():
     try:
+        if not session.get("name"):
+            return redirect(url_for('login'))
         return render_template("index.html", datas=datas)
 
     except Exception as err:
@@ -89,3 +94,18 @@ def download():
     getFile = pd.DataFrame(datas)
     getFile.to_csv(fileName, encoding="utf-8")
     return send_file(fileName, as_attachment=True)
+
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == "POST":
+        session["name"] = request.form.get("name")
+        return redirect(url_for("index"))
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session["name"] = None
+    return redirect(url_for("index"))
